@@ -25,9 +25,10 @@
 			}
 		</script>
 	</head> 
-<body>  
+<body> 
+<?php echo validation_errors();?>
 	<h1>New Account</h1>
-<?php 
+<?php
 	echo form_open('account/createNew');
 	echo form_label('Username'); 
 	echo form_error('username');
@@ -47,6 +48,9 @@
 	echo form_label('Email');
 	echo form_error('email');
 	echo form_input('email',set_value('email'),"required");
+	echo '<img id="captcha" src="' . base_url() . 'securimage/securimage_show.php" alt="CAPTCHA Image" />';
+	echo '<input type="text" name="captcha_code" size="10" maxlength="6" />';
+	echo '<a href="#" onclick="document.getElementById(\'captcha\').src = \' ' . base_url() . 'securimage/securimage_show.php?\' + Math.random(); return false">[ Different Image ]</a>';
 	echo form_submit('submit', 'Register');
 	echo form_close();
 ?>	

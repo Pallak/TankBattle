@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 class Account extends CI_Controller {
      
@@ -70,12 +70,14 @@ class Account extends CI_Controller {
     }
     
     function createNew() {
+    		
     		$this->load->library('form_validation');
     	    $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.login]');
 	    	$this->form_validation->set_rules('password', 'Password', 'required');
 	    	$this->form_validation->set_rules('first', 'First', "required");
 	    	$this->form_validation->set_rules('last', 'last', "required");
 	    	$this->form_validation->set_rules('email', 'Email', "required|is_unique[user.email]");
+	    	$this->form_validation->set_rules('captcha_code', 'Captcha', 'required|callback_checkCaptcha');
 	    	
 	    
 	    	if ($this->form_validation->run() == FALSE)
@@ -194,6 +196,17 @@ class Account extends CI_Controller {
 	    			$this->load->view('account/recoverPasswordForm',$data);
 	    		}
 	    	}
-    }    
+    }
+
+    function checkCaptcha($str){
+    	$this->load->library('securimage');
+    	$securimage = new Securimage();
+    	
+    	if ($securimage->check($str) == false) {
+    		$this->form_validation->set_message('checkCaptcha', 'Captchas do not match');
+    		return FALSE;
+    	}
+    	return TRUE;
+    }
  }
 
