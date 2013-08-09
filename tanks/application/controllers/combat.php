@@ -139,5 +139,35 @@ class Combat extends CI_Controller {
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
  	
+	function postTank() {
+  		$this->load->model('user_model');
+ 		$this->load->model('battle_model');
+
+ 		$user = $_SESSION['user'];
+ 			 
+ 		$user = $this->user_model->getExclusive($user->login);
+ 		if ($user->user_status_id != User::BATTLING) {	
+			$errormsg="Not in BATTLING state";
+ 			goto error;
+ 		}
+ 			
+ 		$battle = $this->battle_model->get($user->battle_id);			
+ 			
+		// get user's tank coords
+ 		
+ 		if ($battle->user1_id == $user->id)  {
+			// update u1
+ 		}
+ 		else {
+ 			// update u2
+ 		}
+ 				
+ 		echo json_encode(array('status'=>'success'));
+
+ 		$errormsg="Missing argument";
+		error:
+			echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 	}
+ 	
  }
 
