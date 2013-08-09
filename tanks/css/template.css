@@ -1,7 +1,11 @@
- body{
- 	background-image:url('http://localhost/csc309db/images/dcs_logo.png');
-	background-repeat:no-repeat;
-	background-size:200px;
+ body {
+ 	/* set background image, center it, make it full screen */
+ 	background: url('../images/desert.png') no-repeat center fixed; 
+  	-webkit-background-size: cover;
+  	-moz-background-size: cover;
+  	-o-background-size: cover;
+  	background-size: cover;
+
     font-family: Arial, Verdana, sans-serif;
     margin:0;
     padding:0;
@@ -21,6 +25,27 @@
  h2{
  	font-size:1em;
  	color: blue;
+ }
+
+ #loginContent{
+ 	/* TODO: adjust for cdf machine screens */
+ 	min-height:900px;
+ 	width: 900px;
+ 	margin: auto;
+	background-color: rgba(0,0,0,0.6);
+ }
+
+ #loginHeader{
+ 	width: 100%;
+ 	height: 200px;
+	background-color: rgba(0,0,0,0.6);
+	text-align: center;
+ }
+
+ #loginForm{
+ 	/*background-color: red;*/
+ 	width:30%;
+ 	margin: 100px auto;
  }
 
  #header{
@@ -49,5 +74,3 @@
     height:800px;
 	background: white;
  }
-
-
