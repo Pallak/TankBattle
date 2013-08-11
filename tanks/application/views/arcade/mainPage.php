@@ -34,7 +34,7 @@
 	<h1>Tank Battle</h1>
 
 	<div>
-	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
+	Hello!! <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
 	</div>
 	
 <?php 

@@ -139,35 +139,94 @@ class Combat extends CI_Controller {
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
  	
-	function postTank() {
-  		$this->load->model('user_model');
+ 	function getTankCoords() {
+ 		$this->load->model('user_model');
  		$this->load->model('battle_model');
-
+ 			
  		$user = $_SESSION['user'];
- 			 
- 		$user = $this->user_model->getExclusive($user->login);
+ 		 
+ 		$user = $this->user_model->get($user->login);
  		if ($user->user_status_id != User::BATTLING) {	
-			$errormsg="Not in BATTLING state";
+ 			$errormsg="Not in BATTLING state";
  			goto error;
  		}
+ 		// start transactional mode
+ 		$this->db->trans_begin();
  			
- 		$battle = $this->battle_model->get($user->battle_id);			
+ 		$battle = $this->battle_model->getExclusive($user->battle_id);			
  			
-		// get user's tank coords
- 		
- 		if ($battle->user1_id == $user->id)  {
-			// update u1
+ 		if ($battle->user1_id == $user->id) {
+			$coords = array('x1'=>$battle->u2_x1,
+							'y1'=>$battle->u2_y1,
+							'x2'=>$battle->u2_x2,
+							'y2'=>$battle->u2_y2,
+							'angle'=>$battle->u2_angle);
+ 			$this->battle_model->updateU2($battle->id, -1, -1, -1, -1, -1, false, false);
  		}
  		else {
- 			// update u2
+			$coords = array('x1'=>$battle->u1_x1,
+							'y1'=>$battle->u1_y1,
+							'x2'=>$battle->u1_x2,
+							'y2'=>$battle->u1_y2,
+							'angle'=>$battle->u1_angle);
+			$this->battle_model->updateU1($battle->id, -1, -1, -1, -1, -1, false, false);
  		}
- 				
- 		echo json_encode(array('status'=>'success'));
 
- 		$errormsg="Missing argument";
+ 		if ($this->db->trans_status() === FALSE) {
+ 			$errormsg = "Transaction error";
+ 			goto transactionerror;
+ 		}
+ 		
+ 		// if all went well commit changes
+ 		$this->db->trans_commit();
+ 		
+ 		echo json_encode(array('status'=>'success','coords'=>$coords));
+		return;
+		
+		transactionerror:
+		$this->db->trans_rollback();
+		
 		error:
-			echo json_encode(array('status'=>'failure','message'=>$errormsg));
+		echo json_encode(array('status'=>'failure','coords'=>$coords));
  	}
  	
+ 	function postTankCoords() {
+
+ 			$this->load->model('user_model');
+ 			$this->load->model('battle_model');
+
+ 			$user = $_SESSION['user'];
+
+ 			$x1 = $_POST['x1'];
+ 			$x2 = $_POST['x2'];
+ 			$y1 = $_POST['y1'];
+ 			$y2 = $_POST['y2'];
+ 			$angle = $_POST['angle'];
+ 			
+ 			$user = $this->user_model->getExclusive($user->login);
+ 			if ($user->user_status_id != User::BATTLING) {	
+				$errormsg="Not in BATTLING state";
+ 				goto error;
+ 			}
+ 			
+ 			$battle = $this->battle_model->get($user->battle_id);			
+ 			 			
+ 			if ($battle->user1_id == $user->id)  {
+ 				$this->battle_model->updateU1($battle->id, $x1, $y1, $x2, $y2, $angle, false, false);
+ 			}
+ 			else {
+	 			$this->battle_model->updateU2($battle->id, $x1, $y1, $x2, $y2, $angle, false, false);
+ 			}
+ 				
+ 			echo json_encode(array('status'=>'success', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle));
+ 			return;
+		
+ 		$errormsg="Missing argument";
+ 		
+		error:
+			echo json_encode(array('status'=>'failure', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle));
+			return;
+ 	}
+ 
  }
 
