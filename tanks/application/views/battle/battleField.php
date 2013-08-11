@@ -5,37 +5,155 @@
 	<head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
+	<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.5.min.js"></script>
 	<script>
 
-		function drawTanks(){		
-			// draw on canvas
-			var canvas = document.getElementById('canvas');
-			var context = canvas.getContext('2d');
+		function translateTank(layer, tank, arguments){
 
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.fillStyle = '#000000';
-			context.fillRect(0, 0, canvas.width, canvas.height);
-			
-			var tank1 = new Image();
-			var tank2 = new Image();
-			
-			if(userCoords.x1!=-1 && userCoords.y1!=-1){
-			    tank1.onload = function() {
-			       context.drawImage(tank1, userCoords.x1, userCoords.y1);
-			    };
-		    }
+			var url = "<?= base_url() ?>combat/postTankCoords";
+			$.post(url,arguments, function (data,textStatus,jqXHR){
+				//invitie
+				meta = $.parseJSON(data);
+				userCoords.x1 = meta.x1;
+				userCoords.y1 = meta.y1;
+				userCoords.x2 = meta.x2;
+				userCoords.y2 = meta.y2;
 
-			if(otherUserCoords.x1!=-1 && otherUserCoords.y1!=-1){
-			    tank2.onload = function(){
-					context.drawImage(tank2, otherUserCoords.x1, otherUserCoords.y1);
-			    };
-		    }
+				var duration = 100;
+				var anim = new Kinetic.Animation(function(frame) {
+	                  if (frame.time >= duration) {
+	                  	anim.stop();
+	                  } else{
+		                tank.setX(userCoords.x1);
+						tank.setY(userCoords.y1);
+	                  }
+	                }, layer);
+	            anim.start();
+			});	
+		}
 
-		    // TODO: changes these images!!!
-			tank1.src = "<?= base_url() ?>images/green-tank.png";
-			tank2.src = "<?= base_url() ?>images/red-tank.png";
+		function rotateTank(layer, tank, arguments, isClockwise){
+
+			var url = "<?= base_url() ?>combat/postTankCoords";
+			$.post(url,arguments, function (data,textStatus,jqXHR){
+				//invitie
+				meta = $.parseJSON(data);
+				userCoords.x1 = meta.x1;
+				userCoords.y1 = meta.y1;
+				userCoords.x2 = meta.x2;
+				userCoords.y2 = meta.y2;
+
+                var angularSpeed = Math.PI / 2;
+                var duration = 90*11.111;
+                var anim = new Kinetic.Animation(function(frame) {
+	                  if (frame.time >= duration) {
+	                    anim.stop();
+	                  } else{
+	                    var angleDiff = frame.timeDiff * angularSpeed / 1000;
+	                    if (isClockwise == 1){
+		                    tank.rotate(angleDiff);
+	                    } else{
+		                    tank.rotate((-1)*angleDiff);
+	                    }
+	                  }
+                }, layer);
+
+                anim.start();
+			});	
 		}
 		
+		function drawTanks(){
+		        var stage = new Kinetic.Stage({
+		          container: 'container',
+		          x:0,
+		          y:0,
+		          width: 1000,
+		          height: 600
+		        });
+		        var layer = new Kinetic.Layer();
+
+		        /*
+		         * leave center point positioned
+		         * at the default which is the top left
+		         * corner of the rectangle
+		         */
+
+		        var imageObj = new Image();
+		        imageObj.onload = function() {
+		          var tank = new Kinetic.Image({
+		            x: 0,
+		            y: 0,
+		            image: imageObj,
+		            width: 50,
+		            height: 64,
+		            offset: [25, 32]
+		          });
+
+
+		      	  tank.rotateDeg(userCoords.x2*90);
+		          tank.move(userCoords.x1, userCoords.y1);
+		          // add the shape to the layer
+		          layer.add(tank);
+		          stage.add(layer);
+
+		          
+		          window.addEventListener('keydown', function(event) {
+		            var keyCode = event.keyCode || event.which;
+		            var keyMap = { left:37, up:38, right:39, down:40 };
+					var arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle};
+
+					switch(keyCode){
+					case keyMap.left:
+						arguments.x2 = (parseInt(userCoords.x2) == 0) ?3 :(parseInt(userCoords.x2)-1);
+						rotateTank(layer, tank, arguments, 0);
+						break;
+
+					case keyMap.right:
+						arguments.x2 = (parseInt(userCoords.x2) == 3) ?0 :(parseInt(userCoords.x2)+1);
+						rotateTank(layer, tank, arguments, 1);
+						break;
+
+					case keyMap.up:
+						switch(userCoords.x2){
+							case "0":
+								arguments.y1 = parseInt(userCoords.y1) - 20;
+								break;
+							case "1":
+								arguments.x1 = parseInt(userCoords.x1) + 20;
+								break;
+							case "2":
+								arguments.y1 = parseInt(userCoords.y1) + 20;
+								break;
+							case "3":
+								arguments.x1 = parseInt(userCoords.x1) - 20;
+								break;
+						}
+						translateTank(layer, tank, arguments);
+						break;
+						
+					case keyMap.down:
+						switch(userCoords.x2){
+							case "0":
+								arguments.y1 = parseInt(userCoords.y1) + 20;
+								break;
+							case "1":
+								arguments.x1 = parseInt(userCoords.x1) - 20;
+								break;
+							case "2":
+								arguments.y1 = parseInt(userCoords.y1) - 20;
+								break;
+							case "3":
+								arguments.x1 = parseInt(userCoords.x1) + 20;
+								break;
+						}
+						translateTank(layer, tank, arguments);
+						break;	
+					}	            
+		          });
+		        };
+		        imageObj.src = "<?= base_url() ?>images/green-tank.png";
+		}
+			
 		function tankCoords(){
 			this.x1 = -1;
 			this.y1 = -1;
@@ -56,7 +174,7 @@
 			if (status == 'battling'){
 				
 				// update tank coords
-				var arguments = {x1:'20', y1:'400', x2:'480', y2:'430', angle:'0'};
+				var arguments = {x1:'75', y1:'420', x2:'0', y2:'430', angle:'0'};
 				var url = "<?= base_url() ?>combat/postTankCoords";
 				$.post(url,arguments, function (data,textStatus,jqXHR){
 					//invitee
@@ -83,7 +201,7 @@
 									$('#status').html('Battling ' + otherUser);
 									//inviter
 									//update tanks coords
-									var arguments = {x1:'900', y1:'20', x2:'70', y2:'20', angle:'180'};
+									var arguments = {x1:'900', y1:'45', x2:'2', y2:'20', angle:'180'};
 									var url = "<?= base_url() ?>combat/postTankCoords";
 									$.post(url,arguments, function (data,textStatus,jqXHR){
 										//invitie
@@ -102,7 +220,7 @@
 						});
 					} else if (status == 'battling'){
 						// get tank coords
-						var url = "<?= base_url() ?>combat/getTankCoords";
+						/*var url = "<?= base_url() ?>combat/getTankCoords";
 						$.getJSON(url, function (data,text,jqXHR){
 							if (data && data.status=='success') {
 								var coords = data.coords;
@@ -112,10 +230,10 @@
 										otherUserCoords.y1 = coords.y1;
 										otherUserCoords.x2 = coords.x2;
 										otherUserCoords.y2 = coords.y2;
-										drawTanks();										
+										//drawTanks();										
 								}
 							}
-						});	
+						});	*/
 					}				
 					
 					var url = "<?= base_url() ?>combat/getMsg";
@@ -140,54 +258,13 @@
 			return false;
 			});	
 		});
-
-		$(document).keydown(function(event){
-			var keyCode = event.keyCode || event.which;
-			var keyMap = { left:37, up:38, right:39, down:40 };
-			var arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle};
-			
-			switch(keyCode){
-				case keyMap.left:
-					arguments.x1 = parseInt(userCoords.x1) - 20;
-					arguments.x2 = parseInt(userCoords.x2) - 20;
-					break;
-
-				case keyMap.right:
-					arguments.x1 = parseInt(userCoords.x1) + 20;
-					arguments.x2 = parseInt(userCoords.x2) + 20;
-					break;
-
-				case keyMap.up:
-					arguments.y1 = parseInt(userCoords.y1) - 20;
-					arguments.y2 = parseInt(userCoords.y2) - 20;
-					break;
-
-				case keyMap.down:
-					arguments.y1 = parseInt(userCoords.y1) + 20;
-					arguments.y2 = parseInt(userCoords.y2) + 20;
-					break;	
-			}
-
-			var url = "<?= base_url() ?>combat/postTankCoords";
-			$.post(url,arguments, function (data,textStatus,jqXHR){
-				//invitie
-				meta = $.parseJSON(data);
-				userCoords.x1 = meta.x1;
-				userCoords.y1 = meta.y1;
-				userCoords.x2 = meta.x2;
-				userCoords.y2 = meta.y2;
-				console.log(meta);
-				// set up canvas for player whose battle invite got accepted
-				drawTanks();
-			});
-		});
 	</script>
 	</head> 
 	
 	<body>  
 		<h1>Battle Field</h1>
 		
-		<canvas id="canvas" height="500px" width="1000px" style="border:5px solid #ff0000;"></canvas>
+		<div id="container" style = "background-color:black; width:1000px; height:600px; "></div>
 	
 		<div>
 		Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
