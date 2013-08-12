@@ -3,6 +3,7 @@
 
 <html>
 	<head>
+	<link href="<?= base_url()?>css/template.css" rel="stylesheet">
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
 	<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.5.5.min.js"></script>
@@ -660,34 +661,36 @@
 	</script>
 	</head> 
 	
-	<body>  
-		<h1>Battle Field</h1>
-		
-		<div id="container" style = "background-color:black; width:1000px; height:600px; "></div>
-	
-		<div>
-		Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
+	<body>  		
+		<div id = "canvasContent">
+			<div id = "canvasContainer">				
+				<div id="container" style = "background-color:black; width:1000px; height:600px; "></div>
+			
+				<div id = "stuffContainer">
+					<div id = "hello">
+					Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
+					</div>
+					
+					<div id='status'> 
+					<?php 
+						if ($status == "battling")
+							echo "Battling " . $otherUser->login;
+						else
+							echo "Waiting on " . $otherUser->login;
+					?>
+					</div>
+					
+					<?php 
+						echo form_textarea('conversation');
+						echo form_open();
+						echo form_input('msg');
+						echo form_submit('Send','Send');
+						echo form_close();
+						
+					?>
+				</div>
+			</div>	
 		</div>
-		
-		<div id='status'> 
-		<?php 
-			if ($status == "battling")
-				echo "Battling " . $otherUser->login;
-			else
-				echo "Waiting on " . $otherUser->login;
-		?>
-		</div>
-		
-		<?php 
-			
-			echo form_textarea('conversation');
-			
-			echo form_open();
-			echo form_input('msg');
-			echo form_submit('Send','Send');
-			echo form_close();
-			
-		?>
 	</body>
 
 </html>

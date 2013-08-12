@@ -18,8 +18,9 @@
  
  
  h1 {
- 	font-size:2em;
- 	color: green;
+ 	padding-top:80px;
+ 	font-size:70px;
+ 	color: white;
  }
  
  h2{
@@ -29,31 +30,54 @@
 
  #loginContent{
  	/* TODO: adjust for cdf machine screens */
- 	min-height:900px;
+ 	min-height:800px;
  	width: 900px;
- 	margin: auto;
+ 	margin: 30px auto;
 	background-color: rgba(0,0,0,0.6);
  }
 
  #loginHeader{
  	width: 100%;
  	height: 200px;
-	background-color: rgba(0,0,0,0.6);
+	background-color: rgba(0,0,0,0.4);
 	text-align: center;
  }
 
  #loginForm{
- 	/*background-color: red;*/
- 	width:30%;
- 	margin: 100px auto;
+ 	width:50%;
+ 	margin: 30px auto;
+ 	color:white;
  }
 
+img, p, input, a{
+	margin:20px;	
+}
+
+a, #status, #hello {
+	color:white;
+	margin:20px;
+}
  #header{
     font-size:12px;
 	width: 700px;
 	height: 50px;
  }
  
+ #container{
+ 	margin: 20px auto;
+ }
+ 
+ #stuffContainer{
+ 	background-color: rgba(0,0,0,0.4);
+ 	width:900px;
+ 	margin: 20px auto;
+ }
+ 
+ textarea{
+ 	width:500px;
+ 	height:50px;
+ }
+
  #header > h1 {
  		text-align:center
  }

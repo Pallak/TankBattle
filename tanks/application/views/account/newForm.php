@@ -1,13 +1,9 @@
-
 <!DOCTYPE html>
 
 <html>
 	<head>
-		<style>
-			input {
-				display: block;
-			}
-		</style>
+		<link href="<?= base_url()?>css/template.css" rel="stylesheet">
+		
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<script>
 			function checkPassword() {
@@ -26,34 +22,46 @@
 		</script>
 	</head> 
 <body> 
-<?php echo validation_errors();?>
-	<h1>New Account</h1>
-<?php
-	echo form_open('account/createNew');
-	echo form_label('Username'); 
-	echo form_error('username');
-	echo form_input('username',set_value('username'),"required");
-	echo form_label('Password'); 
-	echo form_error('password');
-	echo form_password('password','',"id='pass1' required");
-	echo form_label('Password Confirmation'); 
-	echo form_error('passconf');
-	echo form_password('passconf','',"id='pass2' required oninput='checkPassword();'");
-	echo form_label('First');
-	echo form_error('first');
-	echo form_input('first',set_value('first'),"required");
-	echo form_label('Last');
-	echo form_error('last');
-	echo form_input('last',set_value('last'),"required");
-	echo form_label('Email');
-	echo form_error('email');
-	echo form_input('email',set_value('email'),"required");
-	echo '<img id="captcha" src="' . base_url() . 'securimage/securimage_show.php" alt="CAPTCHA Image" />';
-	echo '<input type="text" name="captcha_code" size="10" maxlength="6" />';
-	echo '<a href="#" onclick="document.getElementById(\'captcha\').src = \' ' . base_url() . 'securimage/securimage_show.php?\' + Math.random(); return false">[ Different Image ]</a>';
-	echo form_submit('submit', 'Register');
-	echo form_close();
-?>	
+<div id = "loginContent">
+			<div id = "loginHeader">
+				<!-- TODO: change later to add image -->
+				<h1>
+					Tank Battle!!
+				</h1>
+			</div>
+			
+			<div id = "loginForm">
+				<h1>New Account</h1>
+			<?php
+				echo form_open('account/createNew');
+				echo validation_errors();
+								
+				echo form_label('Username'); 
+				echo form_error('username');
+				echo form_input('username',set_value('username'),"required");
+				echo form_label('Password'); 
+				echo form_error('password');
+				echo form_password('password','',"id='pass1' required");
+				echo form_label('Password Confirmation'); 
+				echo form_error('passconf');
+				echo form_password('passconf','',"id='pass2' required oninput='checkPassword();'");
+				echo form_label('First');
+				echo form_error('first');
+				echo form_input('first',set_value('first'),"required");
+				echo form_label('Last');
+				echo form_error('last');
+				echo form_input('last',set_value('last'),"required");
+				echo form_label('Email');
+				echo form_error('email');
+				echo form_input('email',set_value('email'),"required");
+				echo '<img id="captcha" src="' . base_url() . 'securimage/securimage_show.php" alt="CAPTCHA Image" />';
+				echo '<input type="text" name="captcha_code" size="10" maxlength="6" />';
+				echo '<a href="#" onclick="document.getElementById(\'captcha\').src = \' ' . base_url() . 'securimage/securimage_show.php?\' + Math.random(); return false">[ Different Image ]</a>';
+				echo form_submit('submit', 'Register');
+				echo form_close();
+			?>
+			</div>	
+		</div>	
 </body>
 
 </html>

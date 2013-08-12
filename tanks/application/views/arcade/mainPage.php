@@ -4,7 +4,8 @@
 <html>
 	
 	<head>
-
+	<link href="<?= base_url()?>css/template.css" rel="stylesheet">
+	
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
 	<script>
@@ -30,23 +31,31 @@
 	
 	</script>
 	</head> 
-<body>  
-	<h1>Tank Battle</h1>
-
-	<div>
-	Hello!! <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
-	</div>
-	
-<?php 
-	if (isset($errmsg)) 
-		echo "<p>$errmsg</p>";
-?>
-	<h2>Available Users</h2>
-	<div id="availableUsers">
-	</div>
-	
-	
-	
+	<body>  		
+		<div id = "loginContent">
+			<div id = "loginHeader">
+				<!-- TODO: change later to add image -->
+				<h1>
+					Tank Battle!!
+				</h1>
+			</div>
+			
+			<div id = "loginForm">
+			<h1>Tank Battle</h1>
+		
+			<div>
+				Hello!! <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
+				</div>
+				
+			<?php 
+				if (isset($errmsg)) 
+					echo "<p>$errmsg</p>";
+			?>
+				<h2>Available Users</h2>
+				<div id="availableUsers">
+				</div>
+			</div>	
+		</div>
 </body>
 
 </html>

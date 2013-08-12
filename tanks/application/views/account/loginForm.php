@@ -21,7 +21,7 @@
 						echo "<p>" . $errorMsg . "</p>";
 					}
 
-
+					
 					echo form_open('account/login');
 					echo form_label('Username'); 
 					echo form_error('username');
@@ -35,7 +35,6 @@
 					echo "<p>" . anchor('account/newForm','Create Account') . "</p>";
 
 					echo "<p>" . anchor('account/recoverPasswordForm','Recover Password') . "</p>";
-					
 					
 					echo form_close();
 				?>

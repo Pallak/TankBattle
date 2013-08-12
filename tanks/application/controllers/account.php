@@ -41,19 +41,32 @@ class Account extends CI_Controller {
     			$this->load->model('user_model');
     		
     			$user = $this->user_model->get($login);
-    			 
-    			if (isset($user) && $user->comparePassword($clearPassword)) {
-    				$_SESSION['user'] = $user;
+    		if(isset($_SESSION['loginDate']) && $this->getSecDelay($_SESSION['loginDate']) > 0) {
+    	        $data['errorMsg'] = "You must wait " . $this->getSecDelay($_SESSION['loginDate']) . " seconds before attempting to log in again";
+            	//$data['errorMsg'] = 'some msg';
+            	$this->load->view('account/loginForm', $data);
+            
+          	}else if (isset($user) && $user->comparePassword($clearPassword)) {     			
+          		$_SESSION['user'] = $user;
     				$data['user']=$user;
     				
     				$this->user_model->updateStatus($user->id, User::AVAILABLE);
     				
     				redirect('arcade/index', 'refresh'); //redirect to the main application page
-    			}
- 			else {   			
-				$data['errorMsg']='Incorrect username or password!';
- 				$this->load->view('account/loginForm',$data);
- 			}
+    				
+    		
+            } else {
+            
+            if(!isset($_SESSION['attemptedLogins'])){
+              $_SESSION['attemptedLogins'] = 1;
+            }  else {
+              $_SESSION['attemptedLogins'] = $_SESSION['attemptedLogins'] + 1;
+            }
+
+            $_SESSION['loginDate'] = getdate();
+          	$data['errorMsg']='Incorrect username or password! ';
+            $this->load->view('account/loginForm',$data);
+         } 
     		}
     }
 
@@ -208,5 +221,17 @@ class Account extends CI_Controller {
     	}
     	return TRUE;
     }
+    
+        /**************************HELPER FUNCTIONS*************************************/
+        function getSecDelay($loginDate){
+    	      $currentDate = getdate();
+    	      if($loginDate['mday'] < $currentDate['mday']){
+    		        return 0;
+    		      } else{
+    			        $loginDateSec = $loginDate['seconds'] + $loginDate['minutes']*60 + $loginDate['hours']*60*60;
+    			        $currentDateSec = $currentDate['seconds'] + $currentDate['minutes']*60 + $currentDate['hours']*60*60;
+    			        return ($loginDateSec + pow(2, $_SESSION['attemptedLogins'])) - $currentDateSec;
+    			      }
+    	}
  }
 
