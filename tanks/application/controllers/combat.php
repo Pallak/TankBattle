@@ -161,7 +161,8 @@ class Combat extends CI_Controller {
 							'x2'=>$battle->u2_x2,
 							'y2'=>$battle->u2_y2,
 							'angle'=>$battle->u2_angle,
-							'shot'=>$battle->u2_shot);
+							'shot'=>$battle->u2_shot,
+							'hit'=>$battle->u2_hit);
 			$this->battle_model->updateU2($battle->id, -1, -1, -1, -1, -1, 0, 0);
  		}
  		else {
@@ -170,7 +171,8 @@ class Combat extends CI_Controller {
 							'x2'=>$battle->u1_x2,
 							'y2'=>$battle->u1_y2,
 							'angle'=>$battle->u1_angle,
-						    'shot'=>$battle->u1_shot);
+						    'shot'=>$battle->u1_shot,
+							'hit'=>$battle->u1_hit);
 			$this->battle_model->updateU1($battle->id, -1, -1, -1, -1, -1, 0, 0);
  		}
 
@@ -205,11 +207,18 @@ class Combat extends CI_Controller {
  			$y2 = $_POST['y2'];
  			$angle = $_POST['angle'];
  			$shot = $_POST['shot'];
+ 			$hit = $_POST['hit'];
  
  			if ($shot == 'true' || $shot == '1'){
  				$shot = 1;				
  			} else{
  				$shot = 0;
+ 			}
+ 			
+ 			if ($hit == 'true' || $hit == '1'){
+ 				$hit = 1;
+ 			} else{
+ 				$hit = 0;
  			}
  			
  			$user = $this->user_model->getExclusive($user->login);
@@ -221,19 +230,21 @@ class Combat extends CI_Controller {
  			$battle = $this->battle_model->get($user->battle_id);			
  			 			
  			if ($battle->user1_id == $user->id)  {
- 				$this->battle_model->updateU1($battle->id, $x1, $y1, $x2, $y2, $angle, $shot, false);
+ 				$this->battle_model->updateU1($battle->id, $x1, $y1, $x2, $y2, $angle, $shot, $hit);
  			}
  			else {
-	 			$this->battle_model->updateU2($battle->id, $x1, $y1, $x2, $y2, $angle, $shot, false);
+	 			$this->battle_model->updateU2($battle->id, $x1, $y1, $x2, $y2, $angle, $shot, $hit);
  			}
  				
- 			echo json_encode(array('status'=>'success', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle, 'shot'=>$shot));
+ 			echo json_encode(array('status'=>'success', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 
+ 					'angle'=>$angle, 'shot'=>$shot, 'hit'=>$hit));
  			return;
 		
  		$errormsg="Missing argument";
  		
 		error:
-			echo json_encode(array('status'=>'failure', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle, 'shot'=>$shot));
+			echo json_encode(array('status'=>'failure', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 
+			'angle'=>$angle, 'shot'=>$shot, 'hit'=>$hit));
 			return;
  	}
  

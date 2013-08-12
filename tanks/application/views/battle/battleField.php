@@ -124,16 +124,22 @@
                 bullet.setX(parseInt(meta.x1));
 				bullet.setY(parseInt(meta.y1));
 				layer.draw();
-
+				enemyHit = false;
 				var anim = new Kinetic.Animation(function(frame) {
-	                    if (bullet.getPosition().x > 1000 || bullet.getPosition().x < 0
+						if(enemyHit == true){
+							console.log("HIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+							anim.stop();
+							isBulletAnimating = false;
+						}
+						else if (bullet.getPosition().x > 1000 || bullet.getPosition().x < 0
 	    	                   || bullet.getPosition().y > 600 || bullet.getPosition().y < 0) {
 		                  // bullet out of bounds or hit target -- stop
 	                  	anim.stop();
 	                  	isBulletAnimating = false;
 	                  	bullet.setX(-100);
 	                  	bullet.setY(-100);
-	                  	arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle, shot:"0"};
+	                  	arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, 
+	    	                  	y2:userCoords.y2, angle:userCoords.angle, shot:"0", hit:"0"};
 	                  	$.post(url, arguments, function(data, textStatus, jqXHR){
 							meta2 = $.parseJSON(data);
 							userCoords.shot = meta2.shot;
@@ -143,7 +149,22 @@
 	                    bullet.setX(bullet.getPosition().x + (10*Math.sin(angleRad)));
 	                    bullet.setY(bullet.getPosition().y - (10*Math.cos(angleRad)));
 
-	                    }
+						var centerX = parseInt(otherUserCoords.x1);
+						var centerY = parseInt(otherUserCoords.y1);
+						var dir = parseInt(otherUserCoords.x2);
+
+						if(dir == 0 || dir ==2){
+							if((bullet.getPosition().x <= (centerX+25)) && (bullet.getPosition().x >= (centerX-25)) &&
+								(bullet.getPosition().y <= (centerY+32)) && (bullet.getPosition().y >= (centerY-32))){
+								enemyHit = true;
+							}									
+						} else{
+							if((bullet.getPosition().x <= (centerX+32)) && (bullet.getPosition().x >= (centerX-32)) &&
+								(bullet.getPosition().y <= (centerY+25)) && (bullet.getPosition().y >= (centerY-25))){
+								enemyHit = true;
+							}	
+						}
+	                  }
 	                }, layer);
 	            anim.start();
 			});				
@@ -288,7 +309,7 @@
 					          window.addEventListener('keydown', function(event) {
 				        		var keyCode = event.keyCode || event.which;
 					            var keyMap = { left:37, up:38, right:39, down:40, a:65, d:68, spacebar:32};
-								var arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle, shot:userCoords.shot};
+								var arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle, shot:userCoords.shot, hit:userCoords.hit};
 								
 							  	if(isUserTankAnimated == false){
 									switch(keyCode){
@@ -418,7 +439,7 @@
 			          layer.draw();
 	
 	
-			          $('#container').everyTime(1000, function() {
+			          $('#container').everyTime(500, function() {
 			        	  var url = "<?= base_url() ?>combat/getTankCoords";
 							$.getJSON(url, function (data,text,jqXHR){
 								if (data && data.status=='success') {
@@ -514,7 +535,7 @@
 			if (status == 'battling'){
 				
 				// update tank coords
-				var arguments = {x1:'75', y1:'420', x2:'0', y2:'430', angle:'0', shot:false};
+				var arguments = {x1:'75', y1:'420', x2:'0', y2:'430', angle:'0', shot:false, hit:false};
 				var url = "<?= base_url() ?>combat/postTankCoords";
 				$.post(url,arguments, function (data,textStatus,jqXHR){
 					//invitee
@@ -525,6 +546,7 @@
 					userCoords.y2 = meta.y2;
 					userCoords.angle = meta.angle;
 					userCoords.shot = meta.shot;
+					userCoords.hit = meta.hit;
 					
 					// set up canvas for player whose battle invite got accepted
 					drawTank();
@@ -544,7 +566,7 @@
 									$('#status').html('Battling ' + otherUser);
 									//inviter
 									//update tanks coords
-									var arguments = {x1:'900', y1:'45', x2:'2', y2:'20', angle:'6', shot:false};
+									var arguments = {x1:'900', y1:'45', x2:'2', y2:'20', angle:'6', shot:false, hit:false};
 									var url = "<?= base_url() ?>combat/postTankCoords";
 									$.post(url,arguments, function (data,textStatus,jqXHR){
 										//invitie
@@ -555,6 +577,7 @@
 										userCoords.y2 = meta.y2;
 										userCoords.angle = meta.angle;
 										userCoords.shot = meta.shot;
+										userCoords.hit = meta.hit;
 										
 										// set up canvas for player whose battle invite got accepted
 										drawTank();
