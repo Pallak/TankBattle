@@ -160,16 +160,18 @@ class Combat extends CI_Controller {
 							'y1'=>$battle->u2_y1,
 							'x2'=>$battle->u2_x2,
 							'y2'=>$battle->u2_y2,
-							'angle'=>$battle->u2_angle);
- 			$this->battle_model->updateU2($battle->id, -1, -1, -1, -1, -1, false, false);
+							'angle'=>$battle->u2_angle,
+							'shot'=>$battle->u2_shot);
+			$this->battle_model->updateU2($battle->id, -1, -1, -1, -1, -1, 0, 0);
  		}
  		else {
 			$coords = array('x1'=>$battle->u1_x1,
 							'y1'=>$battle->u1_y1,
 							'x2'=>$battle->u1_x2,
 							'y2'=>$battle->u1_y2,
-							'angle'=>$battle->u1_angle);
-			$this->battle_model->updateU1($battle->id, -1, -1, -1, -1, -1, false, false);
+							'angle'=>$battle->u1_angle,
+						    'shot'=>$battle->u1_shot);
+			$this->battle_model->updateU1($battle->id, -1, -1, -1, -1, -1, 0, 0);
  		}
 
  		if ($this->db->trans_status() === FALSE) {
@@ -202,6 +204,13 @@ class Combat extends CI_Controller {
  			$y1 = $_POST['y1'];
  			$y2 = $_POST['y2'];
  			$angle = $_POST['angle'];
+ 			$shot = $_POST['shot'];
+ 
+ 			if ($shot == 'true' || $shot == '1'){
+ 				$shot = 1;				
+ 			} else{
+ 				$shot = 0;
+ 			}
  			
  			$user = $this->user_model->getExclusive($user->login);
  			if ($user->user_status_id != User::BATTLING) {	
@@ -212,19 +221,19 @@ class Combat extends CI_Controller {
  			$battle = $this->battle_model->get($user->battle_id);			
  			 			
  			if ($battle->user1_id == $user->id)  {
- 				$this->battle_model->updateU1($battle->id, $x1, $y1, $x2, $y2, $angle, false, false);
+ 				$this->battle_model->updateU1($battle->id, $x1, $y1, $x2, $y2, $angle, $shot, false);
  			}
  			else {
-	 			$this->battle_model->updateU2($battle->id, $x1, $y1, $x2, $y2, $angle, false, false);
+	 			$this->battle_model->updateU2($battle->id, $x1, $y1, $x2, $y2, $angle, $shot, false);
  			}
  				
- 			echo json_encode(array('status'=>'success', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle));
+ 			echo json_encode(array('status'=>'success', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle, 'shot'=>$shot));
  			return;
 		
  		$errormsg="Missing argument";
  		
 		error:
-			echo json_encode(array('status'=>'failure', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle));
+			echo json_encode(array('status'=>'failure', 'x1'=> $x1, 'y1'=> $y1, 'x2'=> $x2, 'y2'=> $y2, 'angle'=>$angle, 'shot'=>$shot));
 			return;
  	}
  
