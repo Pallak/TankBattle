@@ -138,13 +138,31 @@
 		}
 
 		function rotateOtherTurret(layer, turret, isClockwise){
-            if(isClockwise){
-				turret.rotateDeg(30);
-            } else{
-				turret.rotateDeg((-1)*30);
-            }
+			angularSpeed = Math.PI / 6;
+			var duration = 1000;
+			var sum = 0;
+			var anim = new Kinetic.Animation(function(frame){
+				if(frame.time > duration) {
+					anim.stop();
+					if(isClockwise){
+						turret.rotate(Math.PI/6 - sum);
+					} else {
+						turret.rotate((-1)*(Math.PI/6 - sum));
+					}
+					layer.draw();
+				} else {
+					var angleDiff = frame.timeDiff * angularSpeed / 1000;
+					if (isClockwise == 1){
+						turret.rotate(angleDiff);
+						sum += angleDiff;
+					} else {
+						turret.rotate((-1)*angleDiff);
+						sum += angleDiff;
+					}
+				}
+			}, layer);
 
-			layer.draw();
+			anim.start();
 		}
 		
 		function drawTank(){
