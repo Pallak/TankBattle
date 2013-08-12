@@ -23,6 +23,7 @@
 				var anim = new Kinetic.Animation(function(frame) {
 	                  if (frame.time >= duration) {
 	                  	anim.stop();
+	                  	isUserTankAnimated = false;
 	                  } else{
 		                tank.setX(userCoords.x1);
 						tank.setY(userCoords.y1);
@@ -44,16 +45,28 @@
 				userCoords.y2 = meta.y2;
 
                 var angularSpeed = Math.PI / 2;
-                var duration = 90*11.111;
+                var duration = 1000;
+                var sum = 0;
                 var anim = new Kinetic.Animation(function(frame) {
-	                  if (frame.time >= duration) {
+	                  if (frame.time > duration) {
 	                    anim.stop();
+	                    if(isClockwise){
+							tank.rotate(Math.PI/2 - sum);
+	                    } else{
+							tank.rotate((-1)*(Math.PI/2 - sum))
+	                    }
+	                    console.log("***********************************");
+		                console.log(sum);
+		                layer.draw();
+		                isUserTankAnimated = false;
 	                  } else{
 	                    var angleDiff = frame.timeDiff * angularSpeed / 1000;
 	                    if (isClockwise == 1){
 		                    tank.rotate(angleDiff);
+		                    sum += angleDiff;
 	                    } else{
 		                    tank.rotate((-1)*angleDiff);
+		                    sum += angleDiff;
 	                    }
 	                  }
                 }, layer);
@@ -62,7 +75,7 @@
 			});	
 		}
 		
-		function drawTanks(){
+		function drawTank(){
 		        var stage = new Kinetic.Stage({
 		          container: 'container',
 		          x:0,
@@ -73,9 +86,8 @@
 		        var layer = new Kinetic.Layer();
 
 		        /*
-		         * leave center point positioned
-		         * at the default which is the top left
-		         * corner of the rectangle
+		         * USER TANK
+		         * 
 		         */
 
 		        var imageObj = new Image();
@@ -98,59 +110,66 @@
 
 		          
 		          window.addEventListener('keydown', function(event) {
-		            var keyCode = event.keyCode || event.which;
-		            var keyMap = { left:37, up:38, right:39, down:40 };
-					var arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle};
-
-					switch(keyCode){
-					case keyMap.left:
-						arguments.x2 = (parseInt(userCoords.x2) == 0) ?3 :(parseInt(userCoords.x2)-1);
-						rotateTank(layer, tank, arguments, 0);
-						break;
-
-					case keyMap.right:
-						arguments.x2 = (parseInt(userCoords.x2) == 3) ?0 :(parseInt(userCoords.x2)+1);
-						rotateTank(layer, tank, arguments, 1);
-						break;
-
-					case keyMap.up:
-						switch(userCoords.x2){
-							case "0":
-								arguments.y1 = parseInt(userCoords.y1) - 20;
-								break;
-							case "1":
-								arguments.x1 = parseInt(userCoords.x1) + 20;
-								break;
-							case "2":
-								arguments.y1 = parseInt(userCoords.y1) + 20;
-								break;
-							case "3":
-								arguments.x1 = parseInt(userCoords.x1) - 20;
-								break;
+			        if(isUserTankAnimated == false){
+			            var keyCode = event.keyCode || event.which;
+			            var keyMap = { left:37, up:38, right:39, down:40 };
+						var arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, y2:userCoords.y2, angle:userCoords.angle};
+	
+						switch(keyCode){
+						case keyMap.left:
+							isUserTankAnimated = true;
+							arguments.x2 = (parseInt(userCoords.x2) == 0) ?3 :(parseInt(userCoords.x2)-1);
+							rotateTank(layer, tank, arguments, 0);
+							break;
+	
+						case keyMap.right:
+							isUserTankAnimated = true;
+							arguments.x2 = (parseInt(userCoords.x2) == 3) ?0 :(parseInt(userCoords.x2)+1);
+							rotateTank(layer, tank, arguments, 1);
+							break;
+	
+						case keyMap.up:
+							isUserTankAnimated = true;
+							switch(userCoords.x2){
+								case "0":
+									arguments.y1 = parseInt(userCoords.y1) - 20;
+									break;
+								case "1":
+									arguments.x1 = parseInt(userCoords.x1) + 20;
+									break;
+								case "2":
+									arguments.y1 = parseInt(userCoords.y1) + 20;
+									break;
+								case "3":
+									arguments.x1 = parseInt(userCoords.x1) - 20;
+									break;
+							}
+							translateTank(layer, tank, arguments);
+							break;
+							
+						case keyMap.down:
+							isUserTankAnimated = true;
+							switch(userCoords.x2){
+								case "0":
+									arguments.y1 = parseInt(userCoords.y1) + 20;
+									break;
+								case "1":
+									arguments.x1 = parseInt(userCoords.x1) - 20;
+									break;
+								case "2":
+									arguments.y1 = parseInt(userCoords.y1) - 20;
+									break;
+								case "3":
+									arguments.x1 = parseInt(userCoords.x1) + 20;
+									break;
+							}
+							translateTank(layer, tank, arguments);
+							break;	
 						}
-						translateTank(layer, tank, arguments);
-						break;
-						
-					case keyMap.down:
-						switch(userCoords.x2){
-							case "0":
-								arguments.y1 = parseInt(userCoords.y1) + 20;
-								break;
-							case "1":
-								arguments.x1 = parseInt(userCoords.x1) - 20;
-								break;
-							case "2":
-								arguments.y1 = parseInt(userCoords.y1) - 20;
-								break;
-							case "3":
-								arguments.x1 = parseInt(userCoords.x1) + 20;
-								break;
-						}
-						translateTank(layer, tank, arguments);
-						break;	
-					}	            
-		          });
-		        };
+			        }	            
+			     });
+			  };
+			        
 		        imageObj.src = "<?= base_url() ?>images/green-tank.png";
 		}
 			
@@ -167,6 +186,8 @@
 		var status = "<?= $status ?>";
 		var userCoords = new tankCoords();
 		var otherUserCoords = new tankCoords();
+		var isUserTankAnimated = false;
+		var isOtherTankAnimated = false;
 		
 		$(function(){
 		
@@ -185,11 +206,11 @@
 					userCoords.y2 = meta.y2;
 					userCoords.angle = meta.angle;
 					// set up canvas for player whose battle invite got accepted
-					drawTanks();
+					drawTank();
 				});
 			}
 			
-			$('body').everyTime(100,function(){
+			$('body').everyTime(1000,function(){
 					if (status == 'waiting') {
 						$.getJSON('<?= base_url() ?>arcade/checkInvitation',function(data, text, jqZHR){
 								if (data && data.status=='rejected') {
@@ -197,7 +218,9 @@
 									window.location.href = '<?= base_url() ?>arcade/index';
 								}
 								if (data && data.status=='accepted') {
+									console.log(status == 'waiting');
 									status = 'battling';
+									
 									$('#status').html('Battling ' + otherUser);
 									//inviter
 									//update tanks coords
@@ -205,6 +228,7 @@
 									var url = "<?= base_url() ?>combat/postTankCoords";
 									$.post(url,arguments, function (data,textStatus,jqXHR){
 										//invitie
+										//console.log("***************GOT INVITED***************************************");
 										meta = $.parseJSON(data);
 										userCoords.x1 = meta.x1;
 										userCoords.y1 = meta.y1;
@@ -213,14 +237,15 @@
 										userCoords.angle = meta.angle;
 										
 										// set up canvas for player whose battle invite got accepted
-										drawTanks();
+										drawTank();
 									});
 								}
 								
 						});
 					} else if (status == 'battling'){
+						var z = 0;
 						// get tank coords
-						/*var url = "<?= base_url() ?>combat/getTankCoords";
+						var url = "<?= base_url() ?>combat/getTankCoords";
 						$.getJSON(url, function (data,text,jqXHR){
 							if (data && data.status=='success') {
 								var coords = data.coords;
@@ -233,7 +258,7 @@
 										//drawTanks();										
 								}
 							}
-						});	*/
+						});	
 					}				
 					
 					var url = "<?= base_url() ?>combat/getMsg";
