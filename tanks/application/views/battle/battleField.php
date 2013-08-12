@@ -19,7 +19,7 @@
 				userCoords.x2 = meta.x2;
 				userCoords.y2 = meta.y2;
 
-				var duration = 100;
+				var duration = 1000;
 				var anim = new Kinetic.Animation(function(frame) {
 	                  if (frame.time >= duration) {
 	                  	anim.stop();
@@ -53,10 +53,8 @@
 	                    if(isClockwise){
 							tank.rotate(Math.PI/2 - sum);
 	                    } else{
-							tank.rotate((-1)*(Math.PI/2 - sum))
+							tank.rotate((-1)*(Math.PI/2 - sum));
 	                    }
-	                    console.log("***********************************");
-		                console.log(sum);
 		                layer.draw();
 		                isUserTankAnimated = false;
 	                  } else{
@@ -74,6 +72,35 @@
                 anim.start();
 			});	
 		}
+
+		function rotateOtherTank(layer, tank, isClockwise){
+			angularSpeed = Math.PI / 2;
+			var duration = 1000;
+			var sum = 0;
+			var anim = new Kinetic.Animation(function(frame){
+				if(frame.time > duration) {
+					anim.stop();
+					if(isClockwise){
+						tank.rotate(Math.PI/2 - sum);
+					} else {
+						tank.rotate((-1)*(Math.PI/2 - sum));
+					}
+					layer.draw();
+				} else {
+					var angleDiff = frame.timeDiff * angularSpeed / 1000;
+					if (isClockwise == 1){
+						tank.rotate(angleDiff);
+						sum += angleDiff;
+					} else {
+						tank.rotate((-1)*angleDiff);
+						sum += angleDiff;
+					}
+				}
+			}, layer);
+
+			anim.start();
+		}
+
 		
 		function drawTank(){
 		        var stage = new Kinetic.Stage({
@@ -86,7 +113,7 @@
 		        var layer = new Kinetic.Layer();
 
 		        /*
-		         * USER TANK
+		         * USER'S TANK
 		         * 
 		         */
 
@@ -171,6 +198,67 @@
 			  };
 			        
 		        imageObj.src = "<?= base_url() ?>images/green-tank.png";
+
+		        /*
+		         * OTHER USER'S TANK
+		         * 
+		         */
+
+		        var imageObj2 = new Image();
+		        imageObj2.onload = function() {
+		          var otherTank = new Kinetic.Image({
+		            x: 0,
+		            y: 0,
+		            image: imageObj2,
+		            width: 50,
+		            height: 64,
+		            offset: [25, 32]
+		          });
+
+		          otherTank.move(-100, -100);
+		          // add the shape to the layer
+		          layer.add(otherTank);
+		          layer.draw();
+
+
+		          $('#container').everyTime(1000, function() {
+		        	  var url = "<?= base_url() ?>combat/getTankCoords";
+						$.getJSON(url, function (data,text,jqXHR){
+							if (data && data.status=='success') {
+								var coords = data.coords;
+								if (coords.x1 != -1 && coords.y1 != -1 &&
+									coords.x2 != -1 && coords.y2 != -1){
+										otherUserCoords.x1 = coords.x1;
+										otherUserCoords.y1 = coords.y1;
+
+										if(isInitialRotation){
+											otherUserCoords.x2 = coords.x2;
+											isInitialRotation = false;
+											otherTank.rotateDeg(parseInt(coords.x2)*90);
+										} else if(coords.x2 != otherUserCoords.x2){
+											if(otherUserCoords.x2 == 3 && coords.x2 == 0){
+												rotateOtherTank(layer, otherTank, 1);
+											} else if (otherUserCoords.x2 == 0 && coords.x2 == 3){
+												rotateOtherTank(layer, otherTank, 0)
+											} else if(otherUserCoords.x2 > coords.x2){
+												rotateOtherTank(layer, otherTank, 0);
+											} else {
+												rotateOtherTank(layer, otherTank, 1);
+											}
+											otherUserCoords.x2 = coords.x2;
+										}
+										
+										otherTank.setX(otherUserCoords.x1);
+										otherTank.setY(otherUserCoords.y1);
+										layer.draw();
+								}
+							}
+						});
+		          });
+			  };
+			        
+		        imageObj2.src = "<?= base_url() ?>images/red-tank.png";
+		      
 		}
 			
 		function tankCoords(){
@@ -188,6 +276,7 @@
 		var otherUserCoords = new tankCoords();
 		var isUserTankAnimated = false;
 		var isOtherTankAnimated = false;
+		var isInitialRotation = true;
 		
 		$(function(){
 		
@@ -218,7 +307,6 @@
 									window.location.href = '<?= base_url() ?>arcade/index';
 								}
 								if (data && data.status=='accepted') {
-									console.log(status == 'waiting');
 									status = 'battling';
 									
 									$('#status').html('Battling ' + otherUser);
@@ -228,7 +316,6 @@
 									var url = "<?= base_url() ?>combat/postTankCoords";
 									$.post(url,arguments, function (data,textStatus,jqXHR){
 										//invitie
-										//console.log("***************GOT INVITED***************************************");
 										meta = $.parseJSON(data);
 										userCoords.x1 = meta.x1;
 										userCoords.y1 = meta.y1;
@@ -242,25 +329,8 @@
 								}
 								
 						});
-					} else if (status == 'battling'){
-						var z = 0;
-						// get tank coords
-						var url = "<?= base_url() ?>combat/getTankCoords";
-						$.getJSON(url, function (data,text,jqXHR){
-							if (data && data.status=='success') {
-								var coords = data.coords;
-								if (coords.x1 != -1 && coords.y1 != -1 &&
-									coords.x2 != -1 && coords.y2 != -1){
-										otherUserCoords.x1 = coords.x1;
-										otherUserCoords.y1 = coords.y1;
-										otherUserCoords.x2 = coords.x2;
-										otherUserCoords.y2 = coords.y2;
-										//drawTanks();										
-								}
-							}
-						});	
-					}				
-					
+					} 
+									
 					var url = "<?= base_url() ?>combat/getMsg";
 					$.getJSON(url, function (data,text,jqXHR){
 						if (data && data.status=='success') {
