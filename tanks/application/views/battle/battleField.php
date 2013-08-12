@@ -16,27 +16,28 @@
 
 			var url = "<?= base_url() ?>combat/postTankCoords";
 			$.post(url,arguments, function (data,textStatus,jqXHR){
-				//invitie
+					//invitie
 				meta = $.parseJSON(data);
-				
-				userCoords.x1 = meta.x1;
-				userCoords.y1 = meta.y1;
-				userCoords.x2 = meta.x2;
-				userCoords.y2 = meta.y2;
-
-				var duration = 1000;
-				var anim = new Kinetic.Animation(function(frame) {
-	                  if (frame.time >= duration) {
-	                  	anim.stop();
-	                  	isUserTankAnimated = false;
-	                  } else{
-		                tank.setX(userCoords.x1);
-						tank.setY(userCoords.y1);
-		                turret.setX(userCoords.x1);
-						turret.setY(userCoords.y1);	                  
-					  }
-	                }, layer);
-	            anim.start();
+				if (meta && meta.status=='success') {
+					userCoords.x1 = meta.x1;
+					userCoords.y1 = meta.y1;
+					userCoords.x2 = meta.x2;
+					userCoords.y2 = meta.y2;
+	
+					var duration = 1000;
+					var anim = new Kinetic.Animation(function(frame) {
+		                  if (frame.time >= duration) {
+		                  	anim.stop();
+		                  	isUserTankAnimated = false;
+		                  } else{
+			                tank.setX(userCoords.x1);
+							tank.setY(userCoords.y1);
+			                turret.setX(userCoords.x1);
+							turret.setY(userCoords.y1);	                  
+						  }
+		                }, layer);
+		            anim.start();
+				}
 			});	
 		}
 
@@ -44,37 +45,40 @@
 			var url = "<?= base_url() ?>combat/postTankCoords";
 			$.post(url,arguments, function (data,textStatus,jqXHR){
 				meta = $.parseJSON(data);
-				userCoords.x1 = meta.x1;
-				userCoords.y1 = meta.y1;
-				userCoords.x2 = meta.x2;
-				userCoords.y2 = meta.y2;
-
-                var angularSpeed = Math.PI / 2;
-                var duration = 1000;
-                var sum = 0;
-                var anim = new Kinetic.Animation(function(frame) {
-	                  if (frame.time > duration) {
-	                    anim.stop();
-	                    if(isClockwise){
-							tank.rotate(Math.PI/2 - sum);
-	                    } else{
-							tank.rotate((-1)*(Math.PI/2 - sum));
-	                    }
-		                layer.draw();
-		                isUserTankAnimated = false;
-	                  } else{
-	                    var angleDiff = frame.timeDiff * angularSpeed / 1000;
-	                    if (isClockwise == 1){
-		                    tank.rotate(angleDiff);
-		                    sum += angleDiff;
-	                    } else{
-		                    tank.rotate((-1)*angleDiff);
-		                    sum += angleDiff;
-	                    }
-	                  }
-                }, layer);
-
-                anim.start();
+				if (meta && meta.status=='success') {
+						
+					userCoords.x1 = meta.x1;
+					userCoords.y1 = meta.y1;
+					userCoords.x2 = meta.x2;
+					userCoords.y2 = meta.y2;
+	
+	                var angularSpeed = Math.PI / 2;
+	                var duration = 1000;
+	                var sum = 0;
+	                var anim = new Kinetic.Animation(function(frame) {
+		                  if (frame.time > duration) {
+		                    anim.stop();
+		                    if(isClockwise){
+								tank.rotate(Math.PI/2 - sum);
+		                    } else{
+								tank.rotate((-1)*(Math.PI/2 - sum));
+		                    }
+			                layer.draw();
+			                isUserTankAnimated = false;
+		                  } else{
+		                    var angleDiff = frame.timeDiff * angularSpeed / 1000;
+		                    if (isClockwise == 1){
+			                    tank.rotate(angleDiff);
+			                    sum += angleDiff;
+		                    } else{
+			                    tank.rotate((-1)*angleDiff);
+			                    sum += angleDiff;
+		                    }
+		                  }
+	                }, layer);
+	
+	                anim.start();
+				}
 			});	
 		}
 
@@ -82,35 +86,36 @@
 			var url = "<?= base_url() ?>combat/postTankCoords";
 			$.post(url,arguments, function (data,textStatus,jqXHR){
 				meta = $.parseJSON(data);
-				userCoords.angle = meta.angle;
-
-				var angularSpeed = Math.PI / 6;
-				var duration = 1000;
-				var sum = 0;
-				var anim = new Kinetic.Animation(function(frame){
-					if (frame.time > duration) {
-	                    anim.stop();
-	                    if(isClockwise){
-							turret.rotate(Math.PI/6 - sum);
-	                    } else{
-							turret.rotate((-1)*(Math.PI/6 - sum));
-	                    }
-	                    layer.draw();
-	                    isUserTankAnimated = false;
-					} else {
-						var angleDiff = frame.timeDiff * angularSpeed / 1000;
-						if(isClockwise == 1){
-							turret.rotate(angleDiff);
-							sum += angleDiff;
+				if (meta && meta.status=='success') {
+					userCoords.angle = meta.angle;
+	
+					var angularSpeed = Math.PI / 6;
+					var duration = 1000;
+					var sum = 0;
+					var anim = new Kinetic.Animation(function(frame){
+						if (frame.time > duration) {
+		                    anim.stop();
+		                    if(isClockwise){
+								turret.rotate(Math.PI/6 - sum);
+		                    } else{
+								turret.rotate((-1)*(Math.PI/6 - sum));
+		                    }
+		                    layer.draw();
+		                    isUserTankAnimated = false;
 						} else {
-							turret.rotate((-1)*angleDiff);
-							sum += angleDiff;
+							var angleDiff = frame.timeDiff * angularSpeed / 1000;
+							if(isClockwise == 1){
+								turret.rotate(angleDiff);
+								sum += angleDiff;
+							} else {
+								turret.rotate((-1)*angleDiff);
+								sum += angleDiff;
+							}
 						}
-					}
-				}, layer);
-
-				anim.start();
-
+					}, layer);
+	
+					anim.start();
+				}
 			});
 		}
 
@@ -118,57 +123,65 @@
 			var url = "<?= base_url() ?>combat/postTankCoords";
 			$.post(url,arguments, function (data,textStatus,jqXHR){
 				meta = $.parseJSON(data);
-				userCoords.shot = meta.shot;
-				isUserTankAnimated = false;
-				isBulletAnimating = true;
-                bullet.setX(parseInt(meta.x1));
-				bullet.setY(parseInt(meta.y1));
-				layer.draw();
-				enemyHit = false;
-				var anim = new Kinetic.Animation(function(frame) {
-						if(enemyHit == true){
-							console.log("HIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-							anim.stop();
-							isBulletAnimating = false;
-						}
-						else if (bullet.getPosition().x > 1000 || bullet.getPosition().x < 0
-	    	                   || bullet.getPosition().y > 600 || bullet.getPosition().y < 0) {
-		                  // bullet out of bounds or hit target -- stop
-	                  	anim.stop();
-	                  	isBulletAnimating = false;
-	                  	bullet.setX(-100);
-	                  	bullet.setY(-100);
-	                  	arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, 
-	    	                  	y2:userCoords.y2, angle:userCoords.angle, shot:"0", hit:"0"};
-	                  	$.post(url, arguments, function(data, textStatus, jqXHR){
-							meta2 = $.parseJSON(data);
-							userCoords.shot = meta2.shot;
-	                  	});
-	                  } else {
-		                var angleRad = toRadians(parseInt(meta.angle)*30);
-	                    bullet.setX(bullet.getPosition().x + (10*Math.sin(angleRad)));
-	                    bullet.setY(bullet.getPosition().y - (10*Math.cos(angleRad)));
-
-						var centerX = parseInt(otherUserCoords.x1);
-						var centerY = parseInt(otherUserCoords.y1);
-						var dir = parseInt(otherUserCoords.x2);
-
-						if(dir == 0 || dir ==2){
-							if((bullet.getPosition().x <= (centerX+25)) && (bullet.getPosition().x >= (centerX-25)) &&
-								(bullet.getPosition().y <= (centerY+32)) && (bullet.getPosition().y >= (centerY-32))){
-								enemyHit = true;
-							}									
-						} else{
-							if((bullet.getPosition().x <= (centerX+32)) && (bullet.getPosition().x >= (centerX-32)) &&
-								(bullet.getPosition().y <= (centerY+25)) && (bullet.getPosition().y >= (centerY-25))){
-								enemyHit = true;
-							}	
-						}
-	                  }
-	                }, layer);
-	            anim.start();
-			});				
-		}
+				if (meta && meta.status=='success') {
+					userCoords.shot = meta.shot;
+					isUserTankAnimated = false;
+					isBulletAnimating = true;
+	                bullet.setX(parseInt(meta.x1));
+					bullet.setY(parseInt(meta.y1));
+					layer.draw();
+					enemyHit = false;
+					var anim = new Kinetic.Animation(function(frame) {
+							if(enemyHit == true){
+								anim.stop();
+								isBulletAnimating = false;
+								var url = "<?= base_url() ?>combat/postBattleStatus";
+								$.post(url, function (data,textStatus,jqXHR){
+									alert("Congratulations, you have won!");
+									window.location.href = '<?= base_url() ?>arcade/index';
+								});
+							}
+							else if (bullet.getPosition().x > 1000 || bullet.getPosition().x < 0
+		    	                   || bullet.getPosition().y > 600 || bullet.getPosition().y < 0) {
+			                  // bullet out of bounds or hit target -- stop
+		                  	anim.stop();
+		                  	isBulletAnimating = false;
+		                  	bullet.setX(-100);
+		                  	bullet.setY(-100);
+		                  	arguments = {x1:userCoords.x1, y1:userCoords.y1, x2:userCoords.x2, 
+		    	                  	y2:userCoords.y2, angle:userCoords.angle, shot:"0", hit:"0"};
+		                  	$.post(url, arguments, function(data, textStatus, jqXHR){
+								meta2 = $.parseJSON(data);
+								if (meta2 && meta2.status=='success') {
+									userCoords.shot = meta2.shot;
+								}
+		                  	});
+		                  } else {
+			                var angleRad = toRadians(parseInt(meta.angle)*30);
+		                    bullet.setX(bullet.getPosition().x + (10*Math.sin(angleRad)));
+		                    bullet.setY(bullet.getPosition().y - (10*Math.cos(angleRad)));
+	
+							var centerX = parseInt(otherUserCoords.x1);
+							var centerY = parseInt(otherUserCoords.y1);
+							var dir = parseInt(otherUserCoords.x2);
+	
+							if(dir == 0 || dir ==2){
+								if((bullet.getPosition().x <= (centerX+25)) && (bullet.getPosition().x >= (centerX-25)) &&
+									(bullet.getPosition().y <= (centerY+32)) && (bullet.getPosition().y >= (centerY-32))){
+									enemyHit = true;
+								}									
+							} else{
+								if((bullet.getPosition().x <= (centerX+32)) && (bullet.getPosition().x >= (centerX-32)) &&
+									(bullet.getPosition().y <= (centerY+25)) && (bullet.getPosition().y >= (centerY-25))){
+									enemyHit = true;
+								}	
+							}
+		                  }
+		            }, layer);
+		            anim.start();
+				}
+			});
+		}			
 
 		function shootOtherBullet(layer, bullet, coords){
             bullet.setX(parseInt(coords.x1));
@@ -329,16 +342,28 @@
 											isUserTankAnimated = true;
 											switch(userCoords.x2){
 												case "0":
-													arguments.y1 = parseInt(userCoords.y1) - 20;
+													var newY1 = parseInt(userCoords.y1) - 20;
+													if(newY1 > 0 && newY1 <600){
+														arguments.y1 = newY1; 
+													}
 													break;
 												case "1":
-													arguments.x1 = parseInt(userCoords.x1) + 20;
+													var newX1  = parseInt(userCoords.x1) + 20;
+													if(newX1 > 0 && newX1 <1000){
+														arguments.x1 = newX1; 
+													}
 													break;
 												case "2":
-													arguments.y1 = parseInt(userCoords.y1) + 20;
+													var newY1  = parseInt(userCoords.y1) + 20;
+													if(newY1 > 0 && newY1 <600){
+														arguments.y1 = newY1; 
+													}
 													break;
 												case "3":
-													arguments.x1 = parseInt(userCoords.x1) - 20;
+													var newX1  = parseInt(userCoords.x1) - 20;
+													if(newX1 > 0 && newX1 <1000){
+														arguments.x1 = newX1; 
+													}
 													break;
 											}
 											translateTank(layer, tank, arguments, turret);
@@ -348,16 +373,28 @@
 											isUserTankAnimated = true;
 											switch(userCoords.x2){
 												case "0":
-													arguments.y1 = parseInt(userCoords.y1) + 20;
+													var newY1  = parseInt(userCoords.y1) + 20;
+													if(newY1 > 0 && newY1 <600){
+														arguments.y1 = newY1; 
+													}													
 													break;
 												case "1":
-													arguments.x1 = parseInt(userCoords.x1) - 20;
+													var newX1  = parseInt(userCoords.x1) - 20;
+													if(newX1 > 0 && newX1 <1000){
+														arguments.x1 = newX1; 
+													}													
 													break;
 												case "2":
-													arguments.y1 = parseInt(userCoords.y1) - 20;
-													break;
+													var newY1 = parseInt(userCoords.y1) - 20;
+													if(newY1 > 0 && newY1 <600){
+														arguments.y1 = newY1; 
+													}
+													break;	
 												case "3":
-													arguments.x1 = parseInt(userCoords.x1) + 20;
+													var newX1  = parseInt(userCoords.x1) + 20;
+													if(newX1 > 0 && newX1 <1000){
+														arguments.x1 = newX1; 
+													}
 													break;
 											}
 											translateTank(layer, tank, arguments, turret);
@@ -439,10 +476,14 @@
 			          layer.draw();
 	
 	
-			          $('#container').everyTime(500, function() {
+			          $('#container').everyTime(1000, function() {
 			        	  var url = "<?= base_url() ?>combat/getTankCoords";
 							$.getJSON(url, function (data,text,jqXHR){
-								if (data && data.status=='success') {
+								console.log(data.status);
+								if (data && data.status=='defeat'){
+									alert(data.msg);
+									window.location.href = '<?= base_url() ?>arcade/index';
+								} else if (data && data.status=='success') {
 									var coords = data.coords;
 									if (coords.x1 != -1 && coords.y1 != -1 &&
 										coords.x2 != -1 && coords.y2 != -1){
@@ -531,27 +572,32 @@
 
 		
 		$(function(){
-			// set up canvas for player who accepted the battle invite 
-			if (status == 'battling'){
-				
-				// update tank coords
-				var arguments = {x1:'75', y1:'420', x2:'0', y2:'430', angle:'0', shot:false, hit:false};
-				var url = "<?= base_url() ?>combat/postTankCoords";
-				$.post(url,arguments, function (data,textStatus,jqXHR){
-					//invitee
-					meta = $.parseJSON(data);
-					userCoords.x1 = meta.x1;
-					userCoords.y1 = meta.y1;
-					userCoords.x2 = meta.x2;
-					userCoords.y2 = meta.y2;
-					userCoords.angle = meta.angle;
-					userCoords.shot = meta.shot;
-					userCoords.hit = meta.hit;
+
+			$(window).load(function(){
+				// set up canvas for player who accepted the battle invite 
+				if (status == 'battling'){
 					
-					// set up canvas for player whose battle invite got accepted
-					drawTank();
-				});
-			}
+					// update tank coords
+					var arguments = {x1:'75', y1:'420', x2:'0', y2:'430', angle:'0', shot:false, hit:false};
+					var url = "<?= base_url() ?>combat/postTankCoords";
+					$.post(url,arguments, function (data,textStatus,jqXHR){
+						//invitee
+						meta = $.parseJSON(data);
+						if (meta && meta.status=='success') {
+							userCoords.x1 = meta.x1;
+							userCoords.y1 = meta.y1;
+							userCoords.x2 = meta.x2;
+							userCoords.y2 = meta.y2;
+							userCoords.angle = meta.angle;
+							userCoords.shot = meta.shot;
+							userCoords.hit = meta.hit;
+							
+							// set up canvas for player whose battle invite got accepted
+							drawTank();
+						}
+					});
+				}
+			});
 			
 			$('body').everyTime(1000,function(){
 					if (status == 'waiting') {
@@ -569,18 +615,20 @@
 									var arguments = {x1:'900', y1:'45', x2:'2', y2:'20', angle:'6', shot:false, hit:false};
 									var url = "<?= base_url() ?>combat/postTankCoords";
 									$.post(url,arguments, function (data,textStatus,jqXHR){
-										//invitie
+										//inviter
 										meta = $.parseJSON(data);
-										userCoords.x1 = meta.x1;
-										userCoords.y1 = meta.y1;
-										userCoords.x2 = meta.x2;
-										userCoords.y2 = meta.y2;
-										userCoords.angle = meta.angle;
-										userCoords.shot = meta.shot;
-										userCoords.hit = meta.hit;
-										
-										// set up canvas for player whose battle invite got accepted
-										drawTank();
+										if (meta && meta.status=='success') {
+											userCoords.x1 = meta.x1;
+											userCoords.y1 = meta.y1;
+											userCoords.x2 = meta.x2;
+											userCoords.y2 = meta.y2;
+											userCoords.angle = meta.angle;
+											userCoords.shot = meta.shot;
+											userCoords.hit = meta.hit;
+											
+											// set up canvas for player whose battle invite got accepted
+											drawTank();
+										}
 									});
 								}
 								

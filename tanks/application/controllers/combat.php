@@ -146,6 +146,14 @@ class Combat extends CI_Controller {
  		$user = $_SESSION['user'];
  		 
  		$user = $this->user_model->get($user->login);
+ 		$battle = $this->battle_model->getExclusive($user->battle_id);
+ 		if ($battle->battle_status_id != Battle::ACTIVE) {
+ 			$this->user_model->updateStatus($user->id,User::AVAILABLE);
+ 			$defeatMsg="Sorry, you lost!! :(";
+ 			echo json_encode(array('status'=>'defeat','msg'=>$defeatMsg));
+ 			return;
+ 		}
+ 		
  		if ($user->user_status_id != User::BATTLING) {	
  			$errormsg="Not in BATTLING state";
  			goto error;
@@ -192,6 +200,24 @@ class Combat extends CI_Controller {
 		
 		error:
 		echo json_encode(array('status'=>'failure','coords'=>$coords));
+ 	}
+ 	
+ 	function postBattleStatus(){
+ 		$this->load->model('user_model');
+ 		$this->load->model('battle_model');
+
+ 		$user = $_SESSION['user'];
+ 		$user = $this->user_model->get($user->login);
+ 		$this->user_model->updateStatus($user->id,User::AVAILABLE);
+ 			
+ 		$battle = $this->battle_model->getExclusive($user->battle_id);
+ 			
+ 		if ($battle->user1_id == $user->id) {
+ 			$this->battle_model->updateStatus($battle->id, Battle::U1WON);
+ 		}
+ 		else {
+ 			$this->battle_model->updateStatus($battle->id, Battle::U2WON);
+ 		}
  	}
  	
  	function postTankCoords() {
